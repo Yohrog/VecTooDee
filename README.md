@@ -1,5 +1,10 @@
 # VecTooDee
-A single header vector math library designed to be used as a bridge between 2D vector implementations
+A single header vector math library designed to be used as a bridge between 2D vector implementations <br>
+Goals of this library:
+- lightweight
+- easy to use
+- minimal overhead
+- seamless conversion between any 2D vector implementation
 
 # Why does this library exist?
 When I was trying out different game engines and corresponding physics engines in 
@@ -13,8 +18,8 @@ C++ I noticed that all of them had different implementations for the same thing:
         // and a bunch of member functions for vector math
     };
 
-I was switching libraries quite a bit I was always spending some time 
-writing some sort of conversion code between the two implementations of the exact same thing.
+I was switching libraries quite a bit and always spent time 
+writing some sort of conversion code between the multiple implementations of 2D vectors.
 Long story short I was getting annoyed because I had to reimplement an adapter class every time. <br>
 Because of that I made this library and implemented it in a single header file, 
 so it is quickly and easily imported into any project. <br>
@@ -61,7 +66,7 @@ If for some reason two vector implementations aren't enough for you, I included 
     // When the corresponding macro is defined, it will implicitly convert to any other vector and back easily
     someVector = vec2(anotherVector)
 
-    // And of course it will provide the basic operators that you would expect (+,-,*,/)
+    // And of course it will provide the basic operators that you would expect (+,-,*,/,+=,-=,*=,/=)
     auto combinedVector = convertedVector + inheritedTypeVector;
     auto scaledVector = combinedVector * 2;
 ```
@@ -70,14 +75,14 @@ While it will function in its entirety without configuration,
 the library does include some preprocessor macros that can be used,
 either for compatibility or for tweaking its functionality:
 
-| **Preprocessor Option**        | **Description**                                                                                                                                                             |
-|--------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **USE_DOUBLE_PRECISION**       | The floating point return values of functions will be double precision floats                                                                                               |
-| **WITHOUT_VECTOR_INHERITANCE** | The vec2 struct will no longer be a child class of the vector struct it was created from                                                                                    |
-| **ALLOW_IMPLICIT_CONVERSION**  | The vec2 struct will convert to any other vector with implicit conversion.<br> This can be very neat for calling functions with it as parameter, but can be harder to debug |
-| **WITHOUT_OPERATORS**          | The vec2 struct will no longer provide any operators, making those in the provided base struct accessible                                                                   |
-| **WITHOUT_MEMBER_FUNCTIONS**   | Removes all member functions from the vec2 struct, so they don't hide base class functions                                                                                  |
-| **WITHOUT_VECTOR_FUNCTIONS**   | This will remove the vectoo namespace and all functions within, leaving only the vec2 struct                                                                                |
+| **Preprocessor Option**        | **Description**                                                                          |
+|--------------------------------|------------------------------------------------------------------------------------------|
+| **USE_DOUBLE_PRECISION**       | The floating point return values of functions will be double precision floats            |
+| **WITHOUT_VECTOR_INHERITANCE** | The vec2 struct will no longer be a child class of the vector struct it was created from |
+| **ALLOW_IMPLICIT_CONVERSION**  | The vec2 struct will convert to any other vector with implicit conversion.               |
+| **WITHOUT_OPERATORS**          | The vec2 struct will no longer provide any operators                                     |
+| **WITHOUT_MEMBER_FUNCTIONS**   | Removes all member functions from the vec2 struct (except for operators)                 |
+| **WITHOUT_VECTOR_FUNCTIONS**   | This will remove the vectoo namespace and all functions within it                        |
 
 These can be either passed as -D parameter during compilation or be '#define'-d before including the header file.
 
@@ -85,3 +90,4 @@ These can be either passed as -D parameter during compilation or be '#define'-d 
 - Better support for integer vectors (both signed and unsigned)
 - More options for defining the exact type of floats that are to be used
 - More uniform naming scheme for functions
+- Support for 3D vectors at some point (although then I'll have to think of a new name)
