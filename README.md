@@ -87,7 +87,7 @@ either for compatibility or for tweaking its functionality:
 These can be either passed as -D parameter during compilation or be '#define'-d before including the header file.
 
 # TODOs
-- Better support for integer vectors (both signed and unsigned)
+- Better support for integer vectors
 - More options for defining the exact type of floats that are to be used
 - More uniform naming scheme for functions
 - Support for 3D vectors at some point (although then I'll have to think of a new name)

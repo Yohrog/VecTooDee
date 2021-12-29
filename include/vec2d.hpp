@@ -43,7 +43,6 @@ using vFloat = float;
 #define vAbs fabs
 #endif
 
-#ifdef WITHOUT_VECTOR_INHERITANCE
 template <typename ArithmeticType>
 struct IndependentVector2
 {
@@ -51,26 +50,22 @@ struct IndependentVector2
     ArithmeticType y;
 };
 
+#ifdef WITHOUT_VECTOR_INHERITANCE
 template <class Vector>
 struct InheritingVector2
 {
     using Vector::x;
     using Vector::y;
 };
-#else
-template <typename ArithmeticType>
-struct IndependentVector2
-{
-    ArithmeticType x;
-    ArithmeticType y;
-};
 
+#else
 template <class Vector>
 struct InheritingVector2 : Vector
 {
     using Vector::x;
     using Vector::y;
 };
+
 #endif
 
 template <class T=vFloat>
