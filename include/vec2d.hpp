@@ -172,6 +172,10 @@ struct vec2 : public std::conditional<std::is_arithmetic<T>::value, IndependentV
         this->x *= other.x;
         this->y *= other.y;
     }
+
+    vec2<T> absolute() const {
+        return {vAbs(this->x), vAbs(this->y)};
+    }
 #endif
 };
 using vec2f = vec2<vFloat>;
@@ -207,6 +211,11 @@ namespace vectoo {
     template<class Vector>
     static inline Vector round(const Vector &vector) {
         return {vRound(vector.x), vRound(vector.y)};
+    }
+
+    template<class Vector>
+    static inline Vector absolute(const Vector &vector) {
+        return {vAbs(vector.x), vAbs(vector.y)};
     }
 
     template<class VectorA, class VectorB>
