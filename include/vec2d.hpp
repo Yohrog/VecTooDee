@@ -27,12 +27,13 @@ SOFTWARE.
 
 #ifdef USE_DOUBLE_PRECISION
 using vFloat = double;
-#define vSin sin
-#define vCos cos
-#define vAcos acos
-#define vSqrt sqrt
-#define vAtan2 atan2
-#define vAbs abs
+#define vSin std::sin
+#define vCos std::cos
+#define vAcos std::acos
+#define vSqrt std::sqrt
+#define vAtan2 std::atan2
+#define vAbs std::abs
+#define vRound std::round
 #else
 using vFloat = float;
 #define vSin sinf
@@ -41,6 +42,7 @@ using vFloat = float;
 #define vSqrt sqrtf
 #define vAtan2 atan2f
 #define vAbs fabs
+#define vRound roundf
 #endif
 
 template <typename ArithmeticType>
@@ -78,17 +80,18 @@ struct vec2 : public std::conditional<std::is_arithmetic<T>::value, IndependentV
 
     template<class Vector>
     explicit vec2(const Vector& vec) {this->x = std::move(vec.x); this->y = std::move(vec.y);};
-    vec2(const vec2&& vec) noexcept {this->x = std::move(vec.x); this->y = std::move(vec.y);};
+    vec2(vec2&& vec) noexcept {this->x = std::move(vec.x); this->y = std::move(vec.y);};
 
 #ifdef ALLOW_IMPLICIT_CONVERSION
     template<class Vector>
     operator Vector() const {
-        return Vector {static_cast<typeof(Vector::x)>(this->x), static_cast<typeof(Vector::y)>(this->y)};
+        return Vector{static_cast<decltype(Vector::x)>(this->x), static_cast<decltype(Vector::y)>(this->y)};
     };
 #else
     template<class Vector>
-    explicit operator Vector() const {return Vector {static_cast<typeof(Vector::x)>(this->x),
-                                                     static_cast<typeof(Vector::y)>(this->y)};};
+    explicit operator Vector() const {
+        return Vector{static_cast<decltype(Vector::x)>(this->x), static_cast<decltype(Vector::y)>(this->y)};
+    };
 #endif
 
 #ifndef WITHOUT_OPERATORS
@@ -100,10 +103,14 @@ struct vec2 : public std::conditional<std::is_arithmetic<T>::value, IndependentV
     vec2 operator+(const Vector& vec) const {return vec2{this->x + vec.x, this->y + vec.y};};
     template <class Vector>
     vec2 operator-(const Vector& other) const {return vec2{this->x - other.x, this->y - other.y};};
-    template<typename Number>
+
+    template<typename Number, typename std::enable_if<std::is_arithmetic<Number>::value, int>::type = 0>
     vec2 operator*(const Number multiplier) const {return vec2(this->x * multiplier, this->y * multiplier);};
-    template<typename Number>
-    vec2 operator/(const Number divisor) const {return vec2(this->x / divisor, this->y / divisor);};
+    template<typename Number, typename std::enable_if<std::is_arithmetic<Number>::value, int>::type = 0>
+    vec2 operator/(const Number divisor) const {return vec2(static_cast<Number>(this->x) / divisor, static_cast<Number>(this->y) / divisor);};
+
+    // Component-wise division
+    vec2 operator/(const vec2& divisor) const {return vec2(this->x / divisor.x, this->y / divisor.y);};
 
     template <class Vector>
     vec2 operator+=(const Vector& vec) {this->x += vec.x; this->y += vec.y; return *this;};
@@ -114,6 +121,9 @@ struct vec2 : public std::conditional<std::is_arithmetic<T>::value, IndependentV
     template<typename Number>
     vec2 operator/=(const Number divisor) {this->x /= divisor; this->y /= divisor; return *this;};
 
+    // Component-wise division
+    vec2 operator/=(const vec2& divisor) {this->x /= divisor.x; this->y /= divisor.y; return *this;};
+
     template <class Vector>
     bool operator==(const Vector& vector) const {return this->x == vector.x && this->y == vector.y;};
     template <class Vector>
@@ -122,12 +132,20 @@ struct vec2 : public std::conditional<std::is_arithmetic<T>::value, IndependentV
 
 #ifndef WITHOUT_MEMBER_FUNCTIONS
 
-    inline vFloat norm() const {
-        return vSqrt(this->x * this->x + this->y * this->y);
+    inline vFloat lengthSquared() const {
+        return this->x * this->x + this->y * this->y;
+    }
+
+    inline vFloat length() const {
+        return vSqrt(lengthSquared());
     }
 
     inline vec2 unitVector() const {
-        return *this / norm();
+        return *this / length();
+    }
+
+    inline vec2 round() const {
+        return vec2<T>(vRound(this->x), vRound(this->y));
     }
 
     inline vFloat rectangleArea() const {
@@ -184,6 +202,11 @@ namespace vectoo {
     template<class Vector>
     static inline Vector unitVector(const Vector &vector) {
         return vector / norm(vector);
+    }
+
+    template<class Vector>
+    static inline Vector round(const Vector &vector) {
+        return {vRound(vector.x), vRound(vector.y)};
     }
 
     template<class VectorA, class VectorB>
@@ -261,8 +284,7 @@ namespace vectoo {
     //reflects the vector off the normal vector
     template<class VectorA, class VectorB>
     static inline VectorA reflect(const VectorA &vector, const VectorB &normal) {
-        const auto unitNormal = unitVector(normal);
-        return reflectUnit(vector, unitNormal);
+        return reflectUnit(vector, unitVector(normal));
     }
 }
 #endif
