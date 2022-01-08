@@ -75,8 +75,8 @@ struct vec2 : public std::conditional<std::is_arithmetic<T>::value, IndependentV
 
     vec2() {this->x = 0; this->y = 0;};
     vec2(const vec2& vec) {this->x = std::move(vec.x); this->y = std::move(vec.y);};
-    template<class Value>
-    vec2(Value x, Value y) {this->x = std::move(x); this->y = std::move(y);};
+    template<class ValueA, class ValueB>
+    vec2(ValueA x, ValueB y) {this->x = std::move(x); this->y = std::move(y);};
 
     template<class Vector>
     explicit vec2(const Vector& vec) {this->x = std::move(vec.x); this->y = std::move(vec.y);};
@@ -128,6 +128,8 @@ struct vec2 : public std::conditional<std::is_arithmetic<T>::value, IndependentV
     bool operator==(const Vector& vector) const {return this->x == vector.x && this->y == vector.y;};
     template <class Vector>
     bool operator!=(const Vector& vector) const {return this->x != vector.x || this->y != vector.y;};
+
+    friend vec2 operator-(const vec2& vec) {return {-vec.x, -vec.y};};
 #endif
 
 #ifndef WITHOUT_MEMBER_FUNCTIONS
