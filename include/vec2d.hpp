@@ -235,6 +235,11 @@ namespace vectoo {
         return vector1.x * vector2.x + vector1.y * vector2.y;
     }
 
+    template<class VectorA, class VectorB>
+    static inline vFloat crossProduct(const VectorA &vector1, const VectorB &vector2) {
+        return vector1.x * vector2.y - vector1.y * vector2.x;
+    }
+
     // Component-wise multiplication
     template<class VectorA, class VectorB>
     static inline VectorA multiplyComponents(const VectorA &vector1, const VectorB &vector2) {
